@@ -12,7 +12,23 @@ export function useTasks() {
     error.value = null
     try {
       const response = await tasksApi.getAll(params)
-      tasksStore.setTasks(response.data.data.data)
+      const result = response.data.data
+
+      // Check if paginated or not
+      if (result.data) {
+        // Paginated response
+        tasksStore.setTasks(result.data)
+        tasksStore.setPagination({
+          currentPage: result.current_page,
+          lastPage: result.last_page,
+          perPage: result.per_page,
+          total: result.total,
+        })
+      } else {
+        // Non-paginated response
+        tasksStore.setTasks(result)
+        tasksStore.setPagination(null)
+      }
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to fetch tasks.'
     } finally {
@@ -25,7 +41,7 @@ export function useTasks() {
     error.value = null
     try {
       const response = await tasksApi.create(data)
-      tasksStore.addTask(response.data.data.data)
+      tasksStore.addTask(response.data.data) // ← response.data.data is the task
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to create task.'

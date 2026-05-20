@@ -11,15 +11,30 @@ import TaskForm from '@/components/tasks/TaskForm.vue'
 const authStore = useAuthStore()
 const tasksStore = useTasksStore()
 const { logout, isLoading: isLoggingOut } = useAuth()
-const { fetchTasks, createTask, updateTask, archiveTask, restoreTask, isLoading } = useTasks()
+const {
+  fetchTasks: fetchTasksComposable,
+  createTask,
+  updateTask,
+  archiveTask,
+  restoreTask,
+  isLoading,
+} = useTasks()
 
 const activeFilter = ref('Active')
 const showForm = ref(false)
 const selectedTask = ref(null)
 
+const currentPage = ref(1)
+
+async function fetchTasks(page = 1) {
+  currentPage.value = page
+  await fetchTasksComposable({ status: activeFilter.value, page })
+}
+
 async function switchFilter(filter) {
   activeFilter.value = filter
-  await fetchTasks({ status: filter })
+  currentPage.value = 1
+  await fetchTasksComposable({ status: filter, page: 1 })
 }
 
 function getStatusClass(status) {
@@ -69,7 +84,7 @@ async function handleRestore(id) {
 }
 
 onMounted(() => {
-  fetchTasks({ status: activeFilter.value })
+  fetchTasks(1)
 })
 </script>
 
@@ -190,6 +205,51 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div
+        v-if="tasksStore.pagination && tasksStore.pagination.lastPage > 1"
+        class="flex items-center justify-between mt-6"
+      >
+        <p class="text-sm text-muted-foreground">
+          Showing {{ tasksStore.tasks.length }} of {{ tasksStore.pagination.total }} tasks
+        </p>
+
+        <div class="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            :disabled="tasksStore.pagination.currentPage === 1 || isLoading"
+            @click="fetchTasks(tasksStore.pagination.currentPage - 1)"
+          >
+            Previous
+          </Button>
+
+          <div class="flex items-center gap-1">
+            <Button
+              v-for="page in tasksStore.pagination.lastPage"
+              :key="page"
+              size="sm"
+              :variant="page === tasksStore.pagination.currentPage ? 'default' : 'outline'"
+              :disabled="isLoading"
+              @click="fetchTasks(page)"
+            >
+              {{ page }}
+            </Button>
+          </div>
+
+          <Button
+            size="sm"
+            variant="outline"
+            :disabled="
+              tasksStore.pagination.currentPage === tasksStore.pagination.lastPage || isLoading
+            "
+            @click="fetchTasks(tasksStore.pagination.currentPage + 1)"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </main>
 
     <!-- Task Form Dialog -->
@@ -199,5 +259,13 @@ onMounted(() => {
       :is-loading="isLoading"
       @submit="handleFormSubmit"
     />
+
+    <!-- Archive Confirmation Dialog -->
+    <!--    <TaskDeleteDialog-->
+    <!--      v-model:open="showArchiveDialog"-->
+    <!--      :task="taskToArchive"-->
+    <!--      :is-loading="isLoading"-->
+    <!--      @confirm="handleArchive"-->
+    <!--    />-->
   </div>
 </template>

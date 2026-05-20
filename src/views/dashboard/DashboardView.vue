@@ -1,33 +1,25 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { tasksApi } from '@/api/tasks'
 import { useAuth } from '@/composables/useAuth'
+import { useTasks } from '@/composables/useTasks'
 import { useAuthStore } from '@/stores/auth'
+import { useTasksStore } from '@/stores/tasks'
 import { Button } from '@/components/ui/button'
 import { LogOut, Plus, RefreshCw } from 'lucide-vue-next'
+import TaskForm from '@/components/tasks/TaskForm.vue'
 
 const authStore = useAuthStore()
+const tasksStore = useTasksStore()
 const { logout, isLoading: isLoggingOut } = useAuth()
+const { fetchTasks, createTask, updateTask, archiveTask, restoreTask, isLoading } = useTasks()
 
-const tasks = ref([])
-const isLoading = ref(false)
 const activeFilter = ref('Active')
-
-async function fetchTasks() {
-  isLoading.value = true
-  try {
-    const response = await tasksApi.getAll({ status: activeFilter.value })
-    tasks.value = response.data.data
-  } catch (err) {
-    console.error('Failed to fetch tasks:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
+const showForm = ref(false)
+const selectedTask = ref(null)
 
 async function switchFilter(filter) {
   activeFilter.value = filter
-  await fetchTasks()
+  await fetchTasks({ status: filter })
 }
 
 function getStatusClass(status) {
@@ -46,8 +38,38 @@ function getPriorityClass(priority) {
   }
 }
 
+function openCreateForm() {
+  selectedTask.value = null
+  showForm.value = true
+}
+
+function openEditForm(task) {
+  selectedTask.value = task
+  showForm.value = true
+}
+
+async function handleFormSubmit(data) {
+  const success = selectedTask.value
+    ? await updateTask(selectedTask.value.id, data)
+    : await createTask(data)
+
+  if (success) {
+    showForm.value = false
+    selectedTask.value = null
+  }
+}
+
+async function handleArchive(id) {
+  await archiveTask(id)
+}
+
+async function handleRestore(id) {
+  await restoreTask(id)
+  await fetchTasks({ status: activeFilter.value })
+}
+
 onMounted(() => {
-  fetchTasks()
+  fetchTasks({ status: activeFilter.value })
 })
 </script>
 
@@ -74,7 +96,7 @@ onMounted(() => {
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold">My Tasks</h2>
-        <Button>
+        <Button @click="openCreateForm">
           <Plus class="h-4 w-4 mr-2" />
           New Task
         </Button>
@@ -83,15 +105,15 @@ onMounted(() => {
       <!-- Filters -->
       <div class="flex gap-2 mb-6">
         <Button
-          :variant="activeFilter === 'Active' ? 'default' : 'outline'"
           size="sm"
+          :variant="activeFilter === 'Active' ? 'default' : 'outline'"
           @click="switchFilter('Active')"
         >
           Active
         </Button>
         <Button
-          :variant="activeFilter === 'Inactive' ? 'default' : 'outline'"
           size="sm"
+          :variant="activeFilter === 'Inactive' ? 'default' : 'outline'"
           @click="switchFilter('Inactive')"
         >
           Archived
@@ -109,7 +131,7 @@ onMounted(() => {
 
       <!-- Empty -->
       <div
-        v-else-if="tasks.length === 0"
+        v-else-if="tasksStore.tasks.length === 0"
         class="text-center py-12 text-muted-foreground border rounded-lg"
       >
         <p class="font-medium">No tasks found.</p>
@@ -121,7 +143,7 @@ onMounted(() => {
       <!-- Task List -->
       <div v-else class="space-y-3">
         <div
-          v-for="task in tasks"
+          v-for="task in tasksStore.tasks"
           :key="task.id"
           class="border rounded-lg p-4 bg-card hover:shadow-sm transition-shadow"
         >
@@ -132,7 +154,7 @@ onMounted(() => {
               <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
                 {{ task.description ?? 'No description' }}
               </p>
-              <p v-if="task.due_date" class="text-xs text-muted-foreground mt-2">
+              <p class="text-xs text-muted-foreground mt-2" v-if="task.due_date">
                 Due: {{ task.due_date }}
               </p>
             </div>
@@ -157,15 +179,25 @@ onMounted(() => {
           <!-- Actions -->
           <div class="flex gap-2 mt-3 pt-3 border-t">
             <template v-if="activeFilter === 'Active'">
-              <Button size="sm" variant="outline">Edit</Button>
-              <Button size="sm" variant="destructive">Archive</Button>
+              <Button size="sm" variant="outline" @click="openEditForm(task)"> Edit </Button>
+              <Button size="sm" variant="destructive" @click="handleArchive(task.id)">
+                Archive
+              </Button>
             </template>
             <template v-else>
-              <Button size="sm" variant="outline">Restore</Button>
+              <Button size="sm" variant="outline" @click="handleRestore(task.id)"> Restore </Button>
             </template>
           </div>
         </div>
       </div>
     </main>
+
+    <!-- Task Form Dialog -->
+    <TaskForm
+      v-model:open="showForm"
+      :task="selectedTask"
+      :is-loading="isLoading"
+      @submit="handleFormSubmit"
+    />
   </div>
 </template>

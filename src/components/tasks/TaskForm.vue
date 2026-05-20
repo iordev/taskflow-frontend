@@ -5,11 +5,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { AlignLeft, CalendarDays, CircleDot, ClipboardList, Flag } from 'lucide-vue-next'
 import { CalendarDate, DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover/index.js'
 import { Calendar } from '@/components/ui/calendar/index.js'
+import { DialogDescription } from '@/components/ui/dialog/index.js'
 
 const props = defineProps({
   open: {
@@ -124,11 +131,11 @@ function handleClose() {
             <DialogTitle class="text-base font-semibold">
               {{ isEditing ? 'Edit Task' : 'Create New Task' }}
             </DialogTitle>
-            <p class="text-xs text-muted-foreground">
+            <DialogDescription class="text-xs">
               {{
                 isEditing ? 'Update task details below' : 'Fill in the details for your new task'
               }}
-            </p>
+            </DialogDescription>
           </div>
         </div>
       </DialogHeader>

@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { tasksApi } from '@/api/tasks'
 import { useTasksStore } from '@/stores/tasks'
-import { toast } from 'vue-sonner'
+import { toast } from 'vue3-toastify'
 
 export function useTasks() {
   const tasksStore = useTasksStore()
@@ -43,14 +43,14 @@ export function useTasks() {
     try {
       const response = await tasksApi.create(data)
       tasksStore.addTask(response.data.data)
-      toast.success('Task Created', {
-        description: 'Your task has been created successfully.',
+      toast.success('Task created successfully.', {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to create task.'
-      toast.error('Error', {
-        description: error.value,
+      toast.error(error.value, {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return false
     } finally {
@@ -63,15 +63,15 @@ export function useTasks() {
     error.value = null
     try {
       const response = await tasksApi.update(id, data)
-      tasksStore.updateTask(response.data.data.data)
-      toast.success('Task Updated', {
-        description: 'Your task has been updated successfully.',
+      tasksStore.updateTask(response.data.data)
+      toast.success('Task updated successfully.', {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to update task.'
-      toast.error('Error', {
-        description: error.value,
+      toast.error(error.value, {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return false
     } finally {
@@ -85,14 +85,14 @@ export function useTasks() {
     try {
       await tasksApi.archive(id)
       tasksStore.removeTask(id)
-      toast.success('Task Archived', {
-        description: 'Your task has been archived successfully.',
+      toast.success('Task archived successfully.', {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to archive task.'
-      toast.error('Error', {
-        description: error.value,
+      toast.error(error.value, {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return false
     } finally {
@@ -106,14 +106,14 @@ export function useTasks() {
     try {
       await tasksApi.restore(id)
       tasksStore.removeTask(id)
-      toast.success('Task Restored', {
-        description: 'Your task has been restored successfully.',
+      toast.success('Task restored successfully.', {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to restore task.'
-      toast.error('Error', {
-        description: error.value,
+      toast.error(error.value, {
+        position: toast.POSITION.TOP_RIGHT,
       })
       return false
     } finally {

@@ -7,7 +7,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 
@@ -41,18 +41,18 @@ function handleClose() {
   <AlertDialog :open="open" @update:open="handleClose">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Archive Task</AlertDialogTitle>
+        <AlertDialogTitle>Restore Task</AlertDialogTitle>
         <AlertDialogDescription>
-          Are you sure you want to archive
-          <span class="font-semibold text-foreground"> "{{ task?.title }}" </span>? You can restore
-          it later from the Archived tab.
+          Are you sure you want to restore
+          <span class="font-semibold text-foreground">"{{ task?.title }}"</span>? It will be moved
+          back to your active tasks.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel :disabled="isLoading" @click="handleClose"> Cancel </AlertDialogCancel>
         <AlertDialogAction as-child>
-          <Button variant="destructive" :disabled="isLoading" @click="handleConfirm">
-            {{ isLoading ? 'Archiving...' : 'Archive' }}
+          <Button :disabled="isLoading" @click="handleConfirm">
+            {{ isLoading ? 'Restoring...' : 'Restore' }}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>

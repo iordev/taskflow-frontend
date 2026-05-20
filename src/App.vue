@@ -1,10 +1,7 @@
 <script setup>
-import { Toaster } from 'vue-sonner'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <Toaster />
   <RouterView />
 </template>
-
-<style scoped></style>

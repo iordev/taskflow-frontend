@@ -34,6 +34,7 @@ async function fetchTasks(page = 1) {
 
 async function switchFilter(filter) {
   activeFilter.value = filter
+  activeFilter.value = filter
   currentPage.value = 1
   await fetchTasksComposable({ status: filter, page: 1 })
 }
@@ -90,9 +91,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="h-screen flex flex-col bg-background">
     <!-- Navbar -->
-    <header class="border-b">
+    <header class="border-b shrink-0">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <h1 class="text-lg font-semibold">TaskFlow</h1>
         <div class="flex items-center gap-3">
@@ -108,9 +109,9 @@ onMounted(() => {
     </header>
 
     <!-- Main -->
-    <main class="max-w-5xl mx-auto px-4 py-8">
+    <main class="flex-1 overflow-hidden max-w-5xl w-full mx-auto px-4 py-8 flex flex-col">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-6 shrink-0">
         <h2 class="text-2xl font-bold">My Tasks</h2>
         <Button @click="openCreateForm">
           <Plus class="h-4 w-4 mr-2" />
@@ -119,7 +120,7 @@ onMounted(() => {
       </div>
 
       <!-- Filters -->
-      <div class="flex gap-2 mb-6">
+      <div class="flex gap-2 mb-6 shrink-0">
         <Button
           size="sm"
           :variant="activeFilter === 'Active' ? 'default' : 'outline'"
@@ -156,8 +157,8 @@ onMounted(() => {
         </p>
       </div>
 
-      <!-- Task List -->
-      <div v-else class="space-y-3">
+      <!-- Scrollable Task List -->
+      <div v-else class="flex-1 overflow-y-auto space-y-3 pr-1">
         <div
           v-for="task in tasksStore.tasks"
           :key="task.id"
@@ -196,7 +197,7 @@ onMounted(() => {
           <div class="flex gap-2 mt-3 pt-3 border-t">
             <template v-if="activeFilter === 'Active'">
               <Button size="sm" variant="outline" @click="openEditForm(task)"> Edit </Button>
-              <Button size="sm" variant="destructive" @click="handleArchive(task.id)">
+              <Button size="sm" variant="destructive" @click="openArchiveDialog(task)">
                 Archive
               </Button>
             </template>
@@ -210,7 +211,7 @@ onMounted(() => {
       <!-- Pagination -->
       <div
         v-if="tasksStore.pagination && tasksStore.pagination.lastPage > 1"
-        class="flex items-center justify-between mt-6"
+        class="flex items-center justify-between mt-4 pt-4 border-t shrink-0"
       >
         <p class="text-sm text-muted-foreground">
           Showing {{ tasksStore.tasks.length }} of {{ tasksStore.pagination.total }} tasks

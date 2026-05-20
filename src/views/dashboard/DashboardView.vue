@@ -25,10 +25,11 @@ const showForm = ref(false)
 const selectedTask = ref(null)
 
 const currentPage = ref(1)
+const perPage = ref(10)
 
 async function fetchTasks(page = 1) {
   currentPage.value = page
-  await fetchTasksComposable({ status: activeFilter.value, page })
+  await fetchTasksComposable({ status: activeFilter.value, page, per_page: perPage.value })
 }
 
 async function switchFilter(filter) {

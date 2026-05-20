@@ -5,7 +5,7 @@ import { useTasks } from '@/composables/useTasks'
 import { useAuthStore } from '@/stores/auth'
 import { useTasksStore } from '@/stores/tasks'
 import { Button } from '@/components/ui/button'
-import { LogOut, Plus, RefreshCw } from 'lucide-vue-next'
+import { Archive, CalendarDays, LogOut, Pencil, Plus, RefreshCw, RotateCcw } from 'lucide-vue-next'
 import TaskForm from '@/components/tasks/TaskForm.vue'
 
 const authStore = useAuthStore()
@@ -41,17 +41,17 @@ async function switchFilter(filter) {
 
 function getStatusClass(status) {
   return {
-    'bg-yellow-100 text-yellow-700': status === 'Pending',
-    'bg-blue-100 text-blue-700': status === 'In Progress',
-    'bg-green-100 text-green-700': status === 'Completed',
+    'bg-yellow-100 text-yellow-800 border border-yellow-200': status === 'Pending',
+    'bg-blue-100 text-blue-800 border border-blue-200': status === 'In Progress',
+    'bg-green-100 text-green-800 border border-green-200': status === 'Completed',
   }
 }
 
 function getPriorityClass(priority) {
   return {
-    'bg-red-100 text-red-700': priority === 'High',
-    'bg-orange-100 text-orange-700': priority === 'Medium',
-    'bg-gray-100 text-gray-700': priority === 'Low',
+    'bg-red-100 text-red-800 border border-red-200': priority === 'High',
+    'bg-orange-100 text-orange-800 border border-orange-200': priority === 'Medium',
+    'bg-gray-100 text-gray-800 border border-gray-200': priority === 'Low',
   }
 }
 
@@ -162,48 +162,82 @@ onMounted(() => {
         <div
           v-for="task in tasksStore.tasks"
           :key="task.id"
-          class="border rounded-lg p-4 bg-card hover:shadow-sm transition-shadow"
+          class="border rounded-lg p-4 bg-card hover:shadow-md transition-all duration-200"
         >
           <div class="flex items-start justify-between gap-4">
-            <!-- Task Info -->
-            <div class="flex-1 min-w-0">
-              <p class="font-medium truncate">{{ task.title }}</p>
-              <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {{ task.description ?? 'No description' }}
+            <!-- Left: Task Info -->
+            <div class="flex-1 min-w-0 space-y-1">
+              <!-- Title -->
+              <p class="font-semibold text-base truncate">{{ task.title }}</p>
+
+              <!-- Description -->
+              <p class="text-sm text-muted-foreground line-clamp-2">
+                {{ task.description ?? 'No description provided.' }}
               </p>
-              <p class="text-xs text-muted-foreground mt-2" v-if="task.due_date">
-                Due: {{ task.due_date }}
-              </p>
+
+              <!-- Due Date -->
+              <div
+                v-if="task.due_date"
+                class="flex items-center gap-1 text-xs text-muted-foreground pt-1"
+              >
+                <CalendarDays class="h-3 w-3" />
+                <span>Due: {{ task.due_date }}</span>
+              </div>
             </div>
 
-            <!-- Badges -->
+            <!-- Right: Badges -->
             <div class="flex flex-col items-end gap-2 shrink-0">
+              <!-- Status Badge -->
               <span
                 :class="getStatusClass(task.status)"
-                class="text-xs px-2 py-1 rounded-full font-medium"
+                class="text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap"
               >
                 {{ task.status }}
               </span>
+              <!-- Priority Badge -->
               <span
                 :class="getPriorityClass(task.priority)"
-                class="text-xs px-2 py-1 rounded-full font-medium"
+                class="text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap"
               >
-                {{ task.priority }}
+                {{ task.priority }} Priority
               </span>
             </div>
           </div>
 
-          <!-- Actions -->
-          <div class="flex gap-2 mt-3 pt-3 border-t">
-            <template v-if="activeFilter === 'Active'">
-              <Button size="sm" variant="outline" @click="openEditForm(task)"> Edit </Button>
-              <Button size="sm" variant="destructive" @click="openArchiveDialog(task)">
-                Archive
-              </Button>
-            </template>
-            <template v-else>
-              <Button size="sm" variant="outline" @click="handleRestore(task.id)"> Restore </Button>
-            </template>
+          <!-- Divider + Actions -->
+          <div class="flex items-center justify-between mt-3 pt-3 border-t">
+            <!-- Created at -->
+            <span class="text-xs text-muted-foreground"> Created {{ task.created_at }} </span>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+              <template v-if="activeFilter === 'Active'">
+                <Button size="sm" variant="outline" class="h-7 text-xs" @click="openEditForm(task)">
+                  <Pencil class="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  class="h-7 text-xs"
+                  @click="openArchiveDialog(task)"
+                >
+                  <Archive class="h-3 w-3 mr-1" />
+                  Archive
+                </Button>
+              </template>
+              <template v-else>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  class="h-7 text-xs"
+                  @click="handleRestore(task.id)"
+                >
+                  <RotateCcw class="h-3 w-3 mr-1" />
+                  Restore
+                </Button>
+              </template>
+            </div>
           </div>
         </div>
       </div>

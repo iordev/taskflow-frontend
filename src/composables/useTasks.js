@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { tasksApi } from '@/api/tasks'
 import { useTasksStore } from '@/stores/tasks'
+import { toast } from 'vue-sonner'
 
 export function useTasks() {
   const tasksStore = useTasksStore()
@@ -41,10 +42,16 @@ export function useTasks() {
     error.value = null
     try {
       const response = await tasksApi.create(data)
-      tasksStore.addTask(response.data.data) // ← response.data.data is the task
+      tasksStore.addTask(response.data.data)
+      toast.success('Task Created', {
+        description: 'Your task has been created successfully.',
+      })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to create task.'
+      toast.error('Error', {
+        description: error.value,
+      })
       return false
     } finally {
       isLoading.value = false
@@ -57,9 +64,15 @@ export function useTasks() {
     try {
       const response = await tasksApi.update(id, data)
       tasksStore.updateTask(response.data.data.data)
+      toast.success('Task Updated', {
+        description: 'Your task has been updated successfully.',
+      })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to update task.'
+      toast.error('Error', {
+        description: error.value,
+      })
       return false
     } finally {
       isLoading.value = false
@@ -72,9 +85,15 @@ export function useTasks() {
     try {
       await tasksApi.archive(id)
       tasksStore.removeTask(id)
+      toast.success('Task Archived', {
+        description: 'Your task has been archived successfully.',
+      })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to archive task.'
+      toast.error('Error', {
+        description: error.value,
+      })
       return false
     } finally {
       isLoading.value = false
@@ -87,9 +106,15 @@ export function useTasks() {
     try {
       await tasksApi.restore(id)
       tasksStore.removeTask(id)
+      toast.success('Task Restored', {
+        description: 'Your task has been restored successfully.',
+      })
       return true
     } catch (err) {
       error.value = err.response?.data?.errors?.[0]?.detail || 'Failed to restore task.'
+      toast.error('Error', {
+        description: error.value,
+      })
       return false
     } finally {
       isLoading.value = false

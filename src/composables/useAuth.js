@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authApi } from '@/api/auth'
 import { useAuthStore } from '@/stores/auth'
+import { toast } from 'vue-sonner'
 
 export function useAuth() {
   const router = useRouter()
@@ -18,6 +19,7 @@ export function useAuth() {
       const { user, token } = response.data.data
 
       authStore.setAuth(user, token)
+      toast.success(`Welcome back, ${user.name}!`)
       await router.push({ name: 'dashboard' })
     } catch (err) {
       error.value =
@@ -36,6 +38,7 @@ export function useAuth() {
       console.error('Logout error:', err)
     } finally {
       authStore.clearAuth()
+      toast.success('Logged out successfully.')
       await router.push({ name: 'login' })
       isLoading.value = false
     }

@@ -1,6 +1,9 @@
-<script setup></script>
+<script setup>
+import { Toaster } from 'vue-sonner'
+</script>
 
 <template>
+  <Toaster />
   <RouterView />
 </template>
 

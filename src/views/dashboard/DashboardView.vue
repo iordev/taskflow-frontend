@@ -162,81 +162,76 @@ onMounted(() => {
         <div
           v-for="task in tasksStore.tasks"
           :key="task.id"
-          class="border rounded-lg p-4 bg-card hover:shadow-md transition-all duration-200"
+          class="border rounded-lg px-4 py-3 bg-card hover:shadow-md transition-all duration-200"
         >
-          <div class="flex items-start justify-between gap-4">
+          <div class="flex items-center justify-between gap-4">
             <!-- Left: Task Info -->
-            <div class="flex-1 min-w-0 space-y-1">
+            <div class="flex-1 min-w-0 space-y-0.5">
               <!-- Title -->
-              <p class="font-semibold text-base truncate">{{ task.title }}</p>
-
+              <p class="font-semibold text-sm truncate">{{ task.title }}</p>
               <!-- Description -->
-              <p class="text-sm text-muted-foreground line-clamp-2">
+              <p class="text-xs text-muted-foreground truncate">
                 {{ task.description ?? 'No description provided.' }}
               </p>
-
               <!-- Due Date -->
               <div
                 v-if="task.due_date"
-                class="flex items-center gap-1 text-xs text-muted-foreground pt-1"
+                class="flex items-center gap-1 text-xs text-muted-foreground"
               >
                 <CalendarDays class="h-3 w-3" />
                 <span>Due: {{ task.due_date }}</span>
               </div>
             </div>
 
-            <!-- Right: Badges -->
-            <div class="flex flex-col items-end gap-2 shrink-0">
-              <!-- Status Badge -->
-              <span
-                :class="getStatusClass(task.status)"
-                class="text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap"
-              >
-                {{ task.status }}
-              </span>
-              <!-- Priority Badge -->
-              <span
-                :class="getPriorityClass(task.priority)"
-                class="text-xs px-2.5 py-1 rounded-full font-medium whitespace-nowrap"
-              >
-                {{ task.priority }} Priority
-              </span>
-            </div>
-          </div>
-
-          <!-- Divider + Actions -->
-          <div class="flex items-center justify-between mt-3 pt-3 border-t">
-            <!-- Created at -->
-            <span class="text-xs text-muted-foreground"> Created {{ task.created_at }} </span>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-2">
-              <template v-if="activeFilter === 'Active'">
-                <Button size="sm" variant="outline" class="h-7 text-xs" @click="openEditForm(task)">
-                  <Pencil class="h-3 w-3 mr-1" />
-                  Edit
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  class="h-7 text-xs"
-                  @click="openArchiveDialog(task)"
+            <!-- Right: Badges + Actions -->
+            <div class="flex items-center gap-3 shrink-0">
+              <!-- Badges -->
+              <div class="flex items-center gap-2">
+                <span
+                  :class="getStatusClass(task.status)"
+                  class="text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
                 >
-                  <Archive class="h-3 w-3 mr-1" />
-                  Archive
-                </Button>
-              </template>
-              <template v-else>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  class="h-7 text-xs"
-                  @click="handleRestore(task.id)"
+                  {{ task.status }}
+                </span>
+                <span
+                  :class="getPriorityClass(task.priority)"
+                  class="text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
                 >
-                  <RotateCcw class="h-3 w-3 mr-1" />
-                  Restore
-                </Button>
-              </template>
+                  {{ task.priority }}
+                </span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-1">
+                <template v-if="activeFilter === 'Active'">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="h-7 w-7 p-0"
+                    @click="openEditForm(task)"
+                  >
+                    <Pencil class="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    class="h-7 w-7 p-0"
+                    @click="openArchiveDialog(task)"
+                  >
+                    <Archive class="h-3 w-3" />
+                  </Button>
+                </template>
+                <template v-else>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="h-7 w-7 p-0"
+                    @click="handleRestore(task.id)"
+                  >
+                    <RotateCcw class="h-3 w-3" />
+                  </Button>
+                </template>
+              </div>
             </div>
           </div>
         </div>

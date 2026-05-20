@@ -18,7 +18,7 @@ export const tasksApi = {
   },
 
   archive(id) {
-    return api.patch(`/tasks/${id}`)
+    return api.patch(`/tasks/${id}/archive`)
   },
 
   restore(id) {

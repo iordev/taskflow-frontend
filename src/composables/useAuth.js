@@ -24,8 +24,19 @@ export function useAuth() {
       })
       await router.push({ name: 'dashboard' })
     } catch (err) {
-      error.value =
-        err.response?.data?.errors?.[0]?.detail || 'Something went wrong. Please try again.'
+      const status = err.response?.status
+      const data = err.response?.data
+
+      if (status === 429) {
+        // Rate limit error
+        error.value = data?.details?.wait_time_detailed || 'Too many requests. Please slow down.'
+      } else if (status === 401) {
+        // Wrong credentials
+        error.value = data?.errors?.[0]?.detail || 'Invalid username or password.'
+      } else {
+        // Generic error
+        error.value = 'Something went wrong. Please try again.'
+      }
     } finally {
       isLoading.value = false
     }

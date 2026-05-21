@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,10 @@ const { login, isLoading, error } = useAuth()
 const form = reactive({
   username: '',
   password: '',
+})
+
+const isFormValid = computed(() => {
+  return form.username.trim() !== '' && form.password.trim() !== ''
 })
 
 async function handleSubmit() {
@@ -72,7 +76,7 @@ async function handleSubmit() {
             </div>
 
             <!-- Submit -->
-            <Button :disabled="isLoading" class="w-full" type="submit">
+            <Button :disabled="isLoading || !isFormValid" class="w-full" type="submit">
               <LogIn v-if="!isLoading" class="h-4 w-4 mr-2" />
               {{ isLoading ? 'Signing in...' : 'Sign In' }}
             </Button>

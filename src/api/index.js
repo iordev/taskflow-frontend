@@ -28,11 +28,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const authStore = useAuthStore()
+    const isLoginRoute = error.config.url.includes('/auth/login')
 
-    // If 401 — token expired or invalid, force logout
-    if (error.response?.status === 401) {
+    // Only redirect to login on 401 if NOT on the login route
+    if (error.response?.status === 401 && !isLoginRoute) {
       authStore.clearAuth()
-      router.push({ name: 'login' }).then((r) => console.log('Redirected to login:', r))
+      router.push({ name: 'login' })
     }
 
     return Promise.reject(error)
